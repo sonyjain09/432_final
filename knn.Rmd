@@ -1,0 +1,98 @@
+---
+title: "432_final"
+output: html_document
+date: "2024-04-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+
+data <- read.csv("caravan.csv")
+
+train_data <- subset(data, ORIGIN == "train")
+test_data <- subset(data, ORIGIN == "test")
+train_data <- subset(train_data, select = -c(ORIGIN))
+test_data <- subset(test_data, select = -c(ORIGIN))
+test_data
+```
+
+
+
+```{r}
+summary_stats <- summary(train_data$MGEMLEEF)
+
+# Optionally, you can include more detailed statistics if needed
+library(dplyr)
+
+# Additional detailed summary using dplyr
+detailed_stats <- train_data %>%
+  summarise(
+    Mean = mean(MGEMLEEF, na.rm = TRUE),
+    Median = median(MGEMLEEF, na.rm = TRUE),
+    SD = sd(MGEMLEEF, na.rm = TRUE),
+    Min = min(MGEMLEEF, na.rm = TRUE),
+    Max = max(MGEMLEEF, na.rm = TRUE),
+    IQR = IQR(MGEMLEEF, na.rm = TRUE),
+    NA_count = sum(is.na(MGEMLEEF))
+  )
+
+# Print the summary statistics
+print(summary_stats)
+print(detailed_stats)
+
+
+
+```
+## Including Plots
+
+```{r}
+library(ggplot2)
+
+# Load the data
+data <- read.csv("caravan.csv")
+
+# Subset data to include only training rows
+train_data <- subset(data, ORIGIN == "train")
+
+# Convert MGEMLEEF to a factor to treat it as categorical
+train_data$MGEMLEEF <- as.factor(train_data$MGEMLEEF)
+
+# Bar Plot of MGEMLEEF
+ggplot(train_data, aes(x = MGEMLEEF)) +
+  geom_bar(fill = "steelblue") +
+  ggtitle("Bar Plot of MGEMLEEF Categories") +
+  xlab("MGEMLEEF Category") +
+  ylab("Count")
+
+# Pie Chart of MGEMLEEF
+mgemleef_table <- table(train_data$MGEMLEEF)
+pie(mgemleef_table, main = "Pie Chart of MGEMLEEF Categories", col = rainbow(length(mgemleef_table)))
+```
+
+You can also embed plots, for example:
+
+```{r}
+install.packages("class")  
+library(class) 
+train_features <- subset(train_data, select = -c(CARAVAN))  # Exclude target variable
+train_labels <- train_data$CARAVAN 
+train_features_scaled <- scale(train_features)
+
+knn_result <- knn(train = train_features_scaled, test = validation_features_scaled, 
+                  cl = train_labels, k = 3)
+table(Predicted = knn_result, Actual = validation_labels)  # Confusion matrix
+
+# Calculate accuracy
+accuracy <- sum(knn_result == validation_labels) / length(validation_labels)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
